@@ -73,6 +73,7 @@ pub struct PreambleData {
     pub comment: String,
 }
 
+pub type SpecialHandler = Box<dyn Fn(&mut HTMLMachine, &str) -> bool>;
 pub trait Machine {
     fn get_content(&self) -> String;
     fn put_text(&mut self, text: Vec<u32>, font_helper: &FontDataHelper) -> f64;
@@ -85,11 +86,7 @@ pub trait Machine {
     fn set_font(&mut self, index: u32);
     fn add_font(&mut self, font: FontDef);
     fn set_preamble_data(&mut self, data: PreambleData);
-    fn handle_special(
-        &mut self,
-        special_handlers: Vec<Box<dyn Fn(&mut HTMLMachine, &str) -> bool>>,
-        comment: &str,
-    );
+    fn handle_special(&mut self, special_handlers: &Vec<SpecialHandler>, comment: &str);
     fn set_nb_pages(&mut self, nb_pages: u16);
 }
 
@@ -98,7 +95,7 @@ pub trait Executor: Machine {
         &mut self,
         instruction: &Instruction,
         font_helper: &FontDataHelper,
-        special_handlers: Vec<Box<dyn Fn(&mut HTMLMachine, &str) -> bool>>,
+        special_handlers: &Vec<SpecialHandler>,
     ) -> Result<(), String> {
         //TODO: dereferences to borrows in Machine methods?
         match instruction {
@@ -135,7 +132,7 @@ pub trait Executor: Machine {
             Instruction::Z(o) => self.get_position().change_down(*o, false),
             Instruction::Font(f) => self.set_font(*f), //TODO: Xxx
             Instruction::Xxx(vec) => {
-                self.handle_special(special_handlers, std::str::from_utf8(&vec).unwrap())
+                self.handle_special(&special_handlers, std::str::from_utf8(&vec).unwrap())
             }
             Instruction::FontDef(def) => self.add_font(def.clone()),
             Instruction::Pre {
@@ -169,6 +166,11 @@ pub trait Executor: Machine {
                 ident: _,
                 two_two_three: _,
             } => (), //TODO?
+        }
+        //Always run a random special, so the specials can see that other instructions are happening
+        match instruction {
+            Instruction::Xxx(_) => (),
+            _ => self.handle_special(&special_handlers, "somethingrandom"),
         }
         Ok(())
     }

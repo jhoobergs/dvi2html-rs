@@ -2,6 +2,7 @@ use crate::machine::Executor;
 use crate::machine::Machine;
 use crate::machine::Position;
 use crate::machine::PreambleData;
+use crate::machine::SpecialHandler;
 use crate::tfm::FontDataHelper;
 use crate::utils::tex_color_to_hex;
 use dvi::FontDef;
@@ -24,6 +25,8 @@ pub struct HTMLMachine {
     fonts: HashMap<u32, FontDef>,
 
     nb_pages: u16,
+
+    svg_buffer: String,
 }
 
 impl HTMLMachine {
@@ -41,6 +44,7 @@ impl HTMLMachine {
             font: None,
             fonts: HashMap::new(),
             nb_pages: 0,
+            svg_buffer: "".to_string(),
         }
     }
 }
@@ -202,11 +206,7 @@ impl Machine for HTMLMachine {
 
         self.points_per_dvi_unit = Some(dvi_unit * 72.27 / 100_000.0 / 2.54);
     }
-    fn handle_special(
-        &mut self,
-        special_handlers: Vec<Box<dyn Fn(&mut HTMLMachine, &str) -> bool>>,
-        command: &str,
-    ) {
+    fn handle_special(&mut self, special_handlers: &Vec<SpecialHandler>, command: &str) {
         for special in special_handlers.iter() {
             if special(self, command) {
                 break;
@@ -262,6 +262,41 @@ impl HTMLMachine {
         }
         false
     }
+
+    fn append_svg(&mut self, s: &str) {
+        self.svg_buffer.push_str(s);
+    } //TODO: go to all specials for every special handler
+
+    fn put_svg(&mut self) {
+        let points_per_dvi_unit = self.points_per_dvi_unit.unwrap();
+        let left = self.position.h() * points_per_dvi_unit;
+        let top = self.position.v() * points_per_dvi_unit;
+
+        self.svg_depth += self.svg_buffer.matches("<svg>").count() as u8;
+        self.svg_depth -= self.svg_buffer.matches("</svg>").count() as u8;
+
+        let mut result_svg = self.svg_buffer.replacen("<svg>", r#"<svg width="10pt" height="10pt" viewBox="-5 -5 10 10" style="overflow: visible; position: absolute;">"#, 1);
+        result_svg = result_svg.replace(r#"{?x}"#, &format!("{}", left));
+        result_svg = result_svg.replace(r#"{?y}"#, &format!("{}", top));
+        result_svg = result_svg.replace(r#"{?nl}"#, "\n");
+
+        self.content.push_str(&result_svg);
+        self.svg_buffer = "".to_string();
+    }
+
+    fn special_svg(&mut self, command: &str) -> bool {
+        let pattern = "dvisvgm:raw ";
+        if command.starts_with(pattern) {
+            let svg = command.split_at(pattern.len()).1;
+            self.append_svg(svg);
+            return true;
+        } else {
+            if !self.svg_buffer.is_empty() {
+                self.put_svg();
+            }
+        }
+        false
+    }
 }
 
 pub fn special_html_color(m: &mut HTMLMachine, command: &str) -> bool {
@@ -270,4 +305,8 @@ pub fn special_html_color(m: &mut HTMLMachine, command: &str) -> bool {
 
 pub fn special_html_papersize(m: &mut HTMLMachine, command: &str) -> bool {
     m.special_papersize(command)
+}
+
+pub fn special_html_svg(m: &mut HTMLMachine, command: &str) -> bool {
+    m.special_svg(command)
 }
