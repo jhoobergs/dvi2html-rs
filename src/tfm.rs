@@ -30,6 +30,6 @@ impl FontDataHelper {
         })
     }
     pub fn get(&self, font_name: String) -> Option<&FontData> {
-        return self.data.get(&font_name);
+        self.data.get(&font_name)
     }
 }

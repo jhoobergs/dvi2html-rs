@@ -58,7 +58,7 @@ impl Machine for HTMLMachine {
 
         // TODO: better error handling
         let font_name = std::str::from_utf8(&font.filename).unwrap();
-        let mut font_data = font_helper.get(font_name.to_string()).unwrap_or_else(|| {
+        let font_data = font_helper.get(font_name.to_string()).unwrap_or_else(|| {
             eprintln!("Using fallback cmb10 for {}", font_name);
             font_helper.get("cmb10".to_string()).unwrap()
         }); // Fallback if font not found
@@ -95,20 +95,20 @@ impl Machine for HTMLMachine {
 
         // tfm is based on 1/2^16 pt units, rather than dviunit which is 10^−7 meters
         let dvi_units_per_font_unit =
-            (font_data.design_size as f64) / 1048576.0 * 65536.0 / 1048576.0;
+            (font_data.design_size as f64) / 1_048_576.0 * 65536.0 / 1_048_576.0;
         let points_per_dvi_unit = self.points_per_dvi_unit.unwrap(); //TODO
 
-        // TODO: remove this line?
-        let top = ((self.position.v() as f64) - (text_height as f64) * dvi_units_per_font_unit)
+        // TODO: remove unused
+        let _top = ((self.position.v() as f64) - (text_height as f64) * dvi_units_per_font_unit)
             * points_per_dvi_unit;
         let left = (self.position.h() as f64) * points_per_dvi_unit;
 
-        let width = (text_width as f64) * points_per_dvi_unit * dvi_units_per_font_unit;
+        let _width = (text_width as f64) * points_per_dvi_unit * dvi_units_per_font_unit;
         let height = (text_height as f64) * points_per_dvi_unit * dvi_units_per_font_unit;
-        let depth = (text_depth as f64) * points_per_dvi_unit * dvi_units_per_font_unit;
+        let _depth = (text_depth as f64) * points_per_dvi_unit * dvi_units_per_font_unit;
         let top = (self.position.v() as f64) * points_per_dvi_unit;
 
-        let fontsize = ((font_data.design_size as f64) / 1048576.0) * (font.scale_factor as f64)
+        let fontsize = ((font_data.design_size as f64) / 1_048_576.0) * (font.scale_factor as f64)
             / (font.design_size as f64);
 
         if self.svg_depth == 0 {
@@ -133,8 +133,8 @@ impl Machine for HTMLMachine {
             ));
         }
 
-        return (text_width as f64) * dvi_units_per_font_unit * (font.scale_factor as f64)
-            / (font.design_size as f64);
+        (text_width as f64) * dvi_units_per_font_unit * (font.scale_factor as f64)
+            / (font.design_size as f64)
     }
 
     fn put_rule(&mut self, ai: i32, bi: i32) {
@@ -150,7 +150,7 @@ impl Machine for HTMLMachine {
 <span style="background: {}; position: absolute; top: {}pt; left: {}pt; width:{}pt; height: {}pt;"></span>
 "#, self.color, top, left, b, a));
     }
-    fn begin_page(&mut self, _arr: [i32; 10], p: i32) {
+    fn begin_page(&mut self, _arr: [i32; 10], _p: i32) {
         self.position_stack.clear();
         //self.position = Position::empty(); //TODO: Optional
     }
@@ -164,7 +164,7 @@ impl Machine for HTMLMachine {
         self.position = self.position_stack.pop().unwrap(); //TODO?
     }
     fn set_font(&mut self, index: u32) {
-        self.font = self.fonts.get(&index).map(|f| f.clone());
+        self.font = self.fonts.get(&index).cloned();
     }
     fn add_font(&mut self, font: FontDef) {
         self.fonts.insert(font.number, font);
@@ -176,10 +176,10 @@ impl Machine for HTMLMachine {
         let dvi_unit = (magnification * numerator) / (1000.0 * denominator);
 
         let resolution = 300.0; // ppi
-        let tfm_conv = (25400000.0 / numerator) * (denominator / 473628672.0) / 16.0;
-        let conv = (numerator / 254000.0) * (resolution / denominator) * (magnification / 1000.0);
+        let _tfm_conv = (25_400_000.0 / numerator) * (denominator / 473_628_672.0) / 16.0;
+        let _conv = (numerator / 254_000.0) * (resolution / denominator) * (magnification / 1000.0);
 
-        self.points_per_dvi_unit = Some(dvi_unit * 72.27 / 100000.0 / 2.54);
+        self.points_per_dvi_unit = Some(dvi_unit * 72.27 / 100_000.0 / 2.54);
     }
 }
 

@@ -46,18 +46,18 @@ impl Position {
         self.v
     }
 
-    pub fn change_right(&mut self, o: &Option<i32>, first: bool) {
+    pub fn change_right(&mut self, o: Option<i32>, first: bool) {
         let index = if first { 0 } else { 1 };
         if let Some(v) = o {
-            self.right[index] = *v;
+            self.right[index] = v;
         }
         self.move_right(self.right[index] as f64);
     }
 
-    pub fn change_down(&mut self, o: &Option<i32>, first: bool) {
+    pub fn change_down(&mut self, o: Option<i32>, first: bool) {
         let index = if first { 0 } else { 1 };
         if let Some(v) = o {
-            self.down[index] = *v;
+            self.down[index] = v;
         }
         self.move_down(self.down[index] as f64);
     }
@@ -120,11 +120,11 @@ pub trait Executor: Machine {
             Instruction::Push => self.push_position(),
             Instruction::Pop => self.pop_position(),
             Instruction::Right(d) => self.get_position().move_right(*d as f64),
-            Instruction::W(o) => self.get_position().change_right(o, true),
-            Instruction::X(o) => self.get_position().change_right(o, false),
+            Instruction::W(o) => self.get_position().change_right(*o, true),
+            Instruction::X(o) => self.get_position().change_right(*o, false),
             Instruction::Down(d) => self.get_position().move_down(*d as f64),
-            Instruction::Y(o) => self.get_position().change_down(o, true),
-            Instruction::Z(o) => self.get_position().change_down(o, false),
+            Instruction::Y(o) => self.get_position().change_down(*o, true),
+            Instruction::Z(o) => self.get_position().change_down(*o, false),
             Instruction::Font(f) => self.set_font(*f), //TODO: Xxx
             Instruction::FontDef(def) => self.add_font(def.clone()),
             Instruction::Pre {
@@ -160,6 +160,6 @@ pub trait Executor: Machine {
             } => (), //TODO?
             _ => (),
         }
-        return Ok(());
+        Ok(())
     }
 }

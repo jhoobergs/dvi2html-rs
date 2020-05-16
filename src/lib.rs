@@ -11,7 +11,7 @@ mod tfm;
 fn parse_dvi(input: &[u8]) -> Vec<Instruction> {
     let mut input = input;
     let mut instructions = Vec::new();
-    while input.len() > 0 {
+    while !input.is_empty() {
         let instruction = match Instruction::parse(&input) {
             IResult::Done(i, inst) => {
                 input = i;
@@ -50,7 +50,7 @@ pub fn dvi2html(input: &[u8]) -> Result<String> {
         }*/
     }
 
-    return Ok(machine.get_content());
+    Ok(machine.get_content())
 }
 
 #[cfg(test)]
