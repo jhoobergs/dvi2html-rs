@@ -1,3 +1,4 @@
+use crate::htmlmachine::HTMLMachine;
 use crate::tfm::FontDataHelper;
 use dvi::{FontDef, Instruction};
 use std::char;
@@ -69,7 +70,7 @@ pub struct PreambleData {
     pub numerator: u32,
     pub denominator: u32,
     pub magnification: u32,
-    pub comment: Vec<u8>,
+    pub comment: String,
 }
 
 pub trait Machine {
@@ -84,6 +85,11 @@ pub trait Machine {
     fn set_font(&mut self, index: u32);
     fn add_font(&mut self, font: FontDef);
     fn set_preamble_data(&mut self, data: PreambleData);
+    fn handle_special(
+        &mut self,
+        special_handlers: Vec<Box<dyn Fn(&mut HTMLMachine, &str) -> bool>>,
+        comment: &str,
+    );
 }
 
 pub trait Executor: Machine {
@@ -91,6 +97,7 @@ pub trait Executor: Machine {
         &mut self,
         instruction: &Instruction,
         font_helper: &FontDataHelper,
+        special_handlers: Vec<Box<dyn Fn(&mut HTMLMachine, &str) -> bool>>,
     ) -> Result<(), String> {
         //TODO: dereferences to borrows in Machine methods?
         match instruction {
@@ -126,6 +133,9 @@ pub trait Executor: Machine {
             Instruction::Y(o) => self.get_position().change_down(*o, true),
             Instruction::Z(o) => self.get_position().change_down(*o, false),
             Instruction::Font(f) => self.set_font(*f), //TODO: Xxx
+            Instruction::Xxx(vec) => {
+                self.handle_special(special_handlers, std::str::from_utf8(&vec).unwrap())
+            }
             Instruction::FontDef(def) => self.add_font(def.clone()),
             Instruction::Pre {
                 format,
@@ -140,7 +150,7 @@ pub trait Executor: Machine {
                     numerator: *numerator,
                     denominator: *denominator,
                     magnification: *magnification,
-                    comment: comment.clone(),
+                    comment: std::str::from_utf8(&comment).unwrap().to_string(), //TODO, handle error
                 });
             }
             Instruction::Post {
@@ -158,7 +168,6 @@ pub trait Executor: Machine {
                 ident: _,
                 two_two_three: _,
             } => (), //TODO?
-            _ => (),
         }
         Ok(())
     }

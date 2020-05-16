@@ -3,6 +3,7 @@ use crate::machine::Machine;
 use crate::machine::Position;
 use crate::machine::PreambleData;
 use crate::tfm::FontDataHelper;
+use crate::utils::tex_color_to_hex;
 use dvi::FontDef;
 use std::char;
 use std::collections::HashMap;
@@ -181,6 +182,37 @@ impl Machine for HTMLMachine {
 
         self.points_per_dvi_unit = Some(dvi_unit * 72.27 / 100_000.0 / 2.54);
     }
+    fn handle_special(
+        &mut self,
+        special_handlers: Vec<Box<dyn Fn(&mut HTMLMachine, &str) -> bool>>,
+        command: &str,
+    ) {
+        for special in special_handlers.iter() {
+            if special(self, command) {
+                break;
+            }
+        }
+    }
 }
 
 impl Executor for HTMLMachine {}
+
+//Specials -> maybe PopColor etc to Machine trait
+impl HTMLMachine {
+    fn special_color(&mut self, command: &str) -> bool {
+        if command.starts_with("color pop") {
+            self.color = self.color_stack.pop().unwrap(); //TODO
+            return false;
+        } else if command.starts_with("color push ") {
+            let color = tex_color_to_hex(command.split_at("color push ".len()).1);
+            self.color_stack.push(color.to_string());
+            self.color = color;
+            return false;
+        }
+        true
+    }
+}
+
+pub fn special_html_color(m: &mut HTMLMachine, command: &str) -> bool {
+    m.special_color(command)
+}

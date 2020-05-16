@@ -6,6 +6,7 @@ use serde_json::Result;
 mod htmlmachine;
 mod machine;
 mod tfm;
+mod utils;
 
 // Copied from https://github.com/derekdreery/dvi-rs/blob/master/tests/lib.rs
 fn parse_dvi(input: &[u8]) -> Vec<Instruction> {
@@ -39,7 +40,11 @@ pub fn dvi2html(input: &[u8]) -> Result<String> {
     let mut machine = htmlmachine::HTMLMachine::new();
     let instructions = parse_dvi(input);
     for ins in instructions.iter() {
-        machine.execute(ins, &font_helper);
+        machine.execute(
+            ins,
+            &font_helper,
+            vec![Box::new(htmlmachine::special_html_color)],
+        );
         /*match ins {
             Instruction::FontDef(def) => {
                 let font_name = std::str::from_utf8(&def.filename).unwrap();
@@ -96,6 +101,16 @@ mod tests {
     fn dvi2html_works() {
         let mut input_owned = Vec::new();
         File::open("testfiles/main.dvi")
+            .unwrap()
+            .read_to_end(&mut input_owned)
+            .unwrap();
+        println!("{}", dvi2html(&input_owned).unwrap());
+        //assert!(true == false);
+    }
+    #[test]
+    fn dvi2html_color_special_works() {
+        let mut input_owned = Vec::new();
+        File::open("testfiles/color.dvi")
             .unwrap()
             .read_to_end(&mut input_owned)
             .unwrap();
