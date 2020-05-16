@@ -175,7 +175,7 @@ impl Machine for HTMLMachine {
 <span style="background: {}; position: absolute; top: {}pt; left: {}pt; width:{}pt; height: {}pt;"></span>
 "#, self.color, top, left, b, a));
     }
-    fn begin_page(&mut self, _arr: [i32; 10], p: i32) {
+    fn begin_page(&mut self, _arr: [i32; 10], _p: i32) {
         self.position_stack.clear();
         //self.position = Position::empty(); //TODO: Optional
     }
@@ -206,7 +206,7 @@ impl Machine for HTMLMachine {
 
         self.points_per_dvi_unit = Some(dvi_unit * 72.27 / 100_000.0 / 2.54);
     }
-    fn handle_special(&mut self, special_handlers: &Vec<SpecialHandler>, command: &str) {
+    fn handle_special(&mut self, special_handlers: &[SpecialHandler], command: &str) {
         for special in special_handlers.iter() {
             if special(self, command) {
                 break;
@@ -290,10 +290,8 @@ impl HTMLMachine {
             let svg = command.split_at(pattern.len()).1;
             self.append_svg(svg);
             return true;
-        } else {
-            if !self.svg_buffer.is_empty() {
-                self.put_svg();
-            }
+        } else if !self.svg_buffer.is_empty() {
+            self.put_svg();
         }
         false
     }

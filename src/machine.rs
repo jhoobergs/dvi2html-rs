@@ -13,15 +13,6 @@ pub struct Position {
 }
 
 impl Position {
-    pub fn new(h: PositionUnit, v: PositionUnit, w: i32, x: i32, y: i32, z: i32) -> Position {
-        Position {
-            h,
-            v,
-            right: [w, x],
-            down: [y, z],
-        }
-    }
-
     pub fn empty() -> Position {
         Position {
             h: 0 as PositionUnit,
@@ -86,7 +77,7 @@ pub trait Machine {
     fn set_font(&mut self, index: u32);
     fn add_font(&mut self, font: FontDef);
     fn set_preamble_data(&mut self, data: PreambleData);
-    fn handle_special(&mut self, special_handlers: &Vec<SpecialHandler>, comment: &str);
+    fn handle_special(&mut self, special_handlers: &[SpecialHandler], comment: &str);
     fn set_nb_pages(&mut self, nb_pages: u16);
 }
 
@@ -95,7 +86,7 @@ pub trait Executor: Machine {
         &mut self,
         instruction: &Instruction,
         font_helper: &FontDataHelper,
-        special_handlers: &Vec<SpecialHandler>,
+        special_handlers: &[SpecialHandler],
     ) -> Result<(), String> {
         //TODO: dereferences to borrows in Machine methods?
         match instruction {
