@@ -8,6 +8,7 @@ use dvi::FontDef;
 use std::char;
 use std::collections::HashMap;
 
+#[derive(Debug)]
 pub struct HTMLMachine {
     content: String,
     color: String,
@@ -21,6 +22,8 @@ pub struct HTMLMachine {
     position_stack: Vec<Position>,
     font: Option<FontDef>,
     fonts: HashMap<u32, FontDef>,
+
+    nb_pages: u16,
 }
 
 impl HTMLMachine {
@@ -37,13 +40,30 @@ impl HTMLMachine {
             position_stack: Vec::new(),
             font: None,
             fonts: HashMap::new(),
+            nb_pages: 0,
         }
     }
 }
 
 impl Machine for HTMLMachine {
     fn get_content(&self) -> String {
-        self.content.clone()
+        let width_text = if let Some(w) = self.paperwidth {
+            format!("width:{}pt;", w)
+        } else {
+            "".to_string()
+        };
+        let height_text = if let Some(h) = self.paperheight {
+            format!("height:{}pt;", h * (self.nb_pages as f64))
+        } else {
+            "".to_string()
+        };
+        format!(
+            r#"<div style="{}{}">{}</div>"#,
+            width_text, height_text, self.content
+        )
+    }
+    fn set_nb_pages(&mut self, nb_pages: u16) {
+        self.nb_pages = nb_pages;
     }
     fn get_position(&mut self) -> &mut Position {
         &mut self.position
@@ -151,7 +171,7 @@ impl Machine for HTMLMachine {
 <span style="background: {}; position: absolute; top: {}pt; left: {}pt; width:{}pt; height: {}pt;"></span>
 "#, self.color, top, left, b, a));
     }
-    fn begin_page(&mut self, _arr: [i32; 10], _p: i32) {
+    fn begin_page(&mut self, _arr: [i32; 10], p: i32) {
         self.position_stack.clear();
         //self.position = Position::empty(); //TODO: Optional
     }
@@ -202,17 +222,52 @@ impl HTMLMachine {
     fn special_color(&mut self, command: &str) -> bool {
         if command.starts_with("color pop") {
             self.color = self.color_stack.pop().unwrap(); //TODO
-            return false;
+            return true;
         } else if command.starts_with("color push ") {
             let color = tex_color_to_hex(command.split_at("color push ".len()).1);
             self.color_stack.push(color.to_string());
             self.color = color;
-            return false;
+            return true;
         }
-        true
+        false
+    }
+
+    fn special_papersize(&mut self, command: &str) -> bool {
+        let pattern = "papersize=";
+        if command.starts_with(pattern) {
+            let sizes = command
+                .split_at(pattern.len())
+                .1
+                .split(',')
+                .collect::<Vec<_>>();
+            //TODO: error if sizes is not of len 2
+            //Error if first or second element doesn't end with 'pt'
+
+            let width = Some(
+                sizes[0]
+                    .split_at(sizes[0].len() - 2)
+                    .0
+                    .parse::<f64>()
+                    .unwrap(),
+            ); //TODO
+            let height = Some(
+                sizes[1]
+                    .split_at(sizes[1].len() - 2)
+                    .0
+                    .parse::<f64>()
+                    .unwrap(),
+            ); //TODO
+            self.paperwidth = width;
+            self.paperheight = height;
+        }
+        false
     }
 }
 
 pub fn special_html_color(m: &mut HTMLMachine, command: &str) -> bool {
     m.special_color(command)
+}
+
+pub fn special_html_papersize(m: &mut HTMLMachine, command: &str) -> bool {
+    m.special_papersize(command)
 }

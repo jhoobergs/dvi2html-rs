@@ -43,16 +43,11 @@ pub fn dvi2html(input: &[u8]) -> Result<String> {
         machine.execute(
             ins,
             &font_helper,
-            vec![Box::new(htmlmachine::special_html_color)],
+            vec![
+                Box::new(htmlmachine::special_html_color),
+                Box::new(htmlmachine::special_html_papersize),
+            ],
         );
-        /*match ins {
-            Instruction::FontDef(def) => {
-                let font_name = std::str::from_utf8(&def.filename).unwrap();
-                println!("{:?}", font_name);
-                //println!("{:?}", font_helper.get(font_name.to_string()));
-            }
-            _ => (),
-        }*/
     }
 
     Ok(machine.get_content())
@@ -111,6 +106,15 @@ mod tests {
     fn dvi2html_color_special_works() {
         let mut input_owned = Vec::new();
         File::open("testfiles/color.dvi")
+            .unwrap()
+            .read_to_end(&mut input_owned)
+            .unwrap();
+        println!("{}", dvi2html(&input_owned).unwrap());
+    }
+    #[test]
+    fn dvi2html_color_pagesize_two_pages_works() {
+        let mut input_owned = Vec::new();
+        File::open("testfiles/two_page.dvi")
             .unwrap()
             .read_to_end(&mut input_owned)
             .unwrap();

@@ -3,8 +3,8 @@ use crate::tfm::FontDataHelper;
 use dvi::{FontDef, Instruction};
 use std::char;
 
-type PositionUnit = f64;
-#[derive(Copy, Clone)]
+type PositionUnit = f64; //TODO
+#[derive(Copy, Clone, Debug)]
 pub struct Position {
     h: PositionUnit,
     v: PositionUnit,
@@ -90,6 +90,7 @@ pub trait Machine {
         special_handlers: Vec<Box<dyn Fn(&mut HTMLMachine, &str) -> bool>>,
         comment: &str,
     );
+    fn set_nb_pages(&mut self, nb_pages: u16);
 }
 
 pub trait Executor: Machine {
@@ -161,8 +162,8 @@ pub trait Executor: Machine {
                 tallest_height: _,
                 widest_width: _,
                 max_stack_depth: _,
-                total_no_pages: _,
-            } => (), //TODO?
+                total_no_pages,
+            } => self.set_nb_pages(*total_no_pages), //TODO?
             Instruction::PostPost {
                 post_pointer: _,
                 ident: _,
