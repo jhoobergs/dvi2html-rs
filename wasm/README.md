@@ -7,6 +7,8 @@
 </div>
 
 ## About
+- NPM package to convet dvi files (as Uint8Array) to html
+- It uses the dvi2html rust package (see [crate](https://github.com/jhoobergs/dvi2html-rs/tree/master/crate) folder)
 
 ## Development
 
@@ -38,5 +40,5 @@ wasm-pack publish
   for logging panic messages to the developer console.
 * [`wee_alloc`](https://github.com/rustwasm/wee_alloc), an allocator optimized
   for small code size.
-* [tutorials]: https://rustwasm.github.io/docs/wasm-pack/tutorials/index.html
-* [template-docs]: https://rustwasm.github.io/docs/wasm-pack/tutorials/npm-browser-packages/index.html
+* [tutorials](https://rustwasm.github.io/docs/wasm-pack/tutorials/index.html)
+* [template-docs](https://rustwasm.github.io/docs/wasm-pack/tutorials/npm-browser-packages/index.html)
