@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Result;
 use std::collections::HashMap;
-use std::fs;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FontCharacterMetrics {
@@ -25,7 +24,16 @@ pub struct FontDataHelper {
 impl FontDataHelper {
     pub fn init() -> Result<FontDataHelper> {
         //let json = fs::read_to_string("fontsfull.json").expect("Failed to read the font json file");
-        let json = r#"
+        let json = get_json();
+        let data = serde_json::from_str(&json)?;
+        Ok(FontDataHelper { data })
+    }
+    pub fn get(&self, font_name: String) -> Option<&FontData> {
+        self.data.get(&font_name)
+    }
+}
+fn get_json() -> String {
+    return r#"
 {
   "cmb10": {
     "characters": {
@@ -88832,11 +88840,6 @@ impl FontDataHelper {
     "largest_character_code": 127,
     "design_size": 9437184
   }
-}"#;
-        let data = serde_json::from_str(&json)?;
-        Ok(FontDataHelper { data })
-    }
-    pub fn get(&self, font_name: String) -> Option<&FontData> {
-        self.data.get(&font_name)
-    }
+}"#
+    .to_string();
 }

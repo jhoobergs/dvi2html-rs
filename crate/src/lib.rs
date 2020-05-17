@@ -1,6 +1,6 @@
 use crate::machine::Executor;
 use crate::machine::Machine;
-use dvi::{IResult, Instruction};
+use dvi::Instruction;
 use serde_json::Result;
 
 mod htmlmachine;
@@ -24,17 +24,6 @@ fn parse_dvi(input: &[u8]) -> Vec<Instruction> {
         instructions.push(instruction);
     }
     instructions
-}
-
-// Copied from https://github.com/derekdreery/dvi-rs/blob/master/tests/lib.rs
-// Adapted to new version of nom
-fn dump_as_dvi(input: &[Instruction]) -> Vec<u8> {
-    // will still reallocate but hopefully less
-    let mut output = Vec::with_capacity(input.len());
-    for inst in input {
-        inst.dump(&mut output).unwrap();
-    }
-    output
 }
 
 pub fn dvi2html(input: &[u8]) -> Result<String> {
@@ -77,20 +66,6 @@ mod tests {
                     two_two_three: 5
                 }
         );
-        let dumped = dump_as_dvi(&instructions);
-        // works, but not not guaranteed to in general, since a Vec<Instruciton> has multiple valid
-        // dumped representations (because u8 can be stored u32 etc)
-        assert_eq!(input_owned, dumped);
-        let parsed_again = parse_dvi(&dumped);
-
-        for (i, (first, second)) in instructions.iter().zip(parsed_again.iter()).enumerate() {
-            assert_eq!(
-                first, second,
-                "Error: {:?} != {:?}, token no {}",
-                first, second, i
-            );
-        }
-        assert_eq!(instructions, parsed_again);
     }
     #[test]
     fn dvi2html_works() {
