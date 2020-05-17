@@ -9,16 +9,17 @@ mod tfm;
 mod utils;
 
 // Copied from https://github.com/derekdreery/dvi-rs/blob/master/tests/lib.rs
+// Adapted to new version of nom
 fn parse_dvi(input: &[u8]) -> Vec<Instruction> {
     let mut input = input;
     let mut instructions = Vec::new();
     while !input.is_empty() {
         let instruction = match Instruction::parse(&input) {
-            IResult::Done(i, inst) => {
+            Ok((i, inst)) => {
                 input = i;
                 inst
             }
-            IResult::Incomplete(_) | IResult::Error(_) => panic!("Parse error"),
+            _ => panic!("Parse error"),
         };
         instructions.push(instruction);
     }
@@ -26,6 +27,7 @@ fn parse_dvi(input: &[u8]) -> Vec<Instruction> {
 }
 
 // Copied from https://github.com/derekdreery/dvi-rs/blob/master/tests/lib.rs
+// Adapted to new version of nom
 fn dump_as_dvi(input: &[Instruction]) -> Vec<u8> {
     // will still reallocate but hopefully less
     let mut output = Vec::with_capacity(input.len());
