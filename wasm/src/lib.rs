@@ -10,7 +10,7 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen]
 pub fn dvi2html(input: &[u8]) -> Result<String, JsValue> {
-    match dvi2html_rs::dvi2html(input) {
+    match dvi2html::dvi2html(input) {
         Ok(s) => Ok(s),
         Err(_) => Err(JsValue::from_str("Something went wrong")), //TODO
     }

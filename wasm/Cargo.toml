@@ -2,6 +2,9 @@
 name = "dvi2html-wasm"
 version = "0.1.0"
 authors = ["Jesse Hoobergs <jesse@hoobergs.be>"]
+description = "A dvi2html converter written in Rust and ported to WebAssembly using wasm-pack"
+repository= "https://github.com/jhoobergs/dvi2html-rs/tree/master/wasm"
+license="MIT"
 edition = "2018"
 
 [lib]
@@ -12,7 +15,7 @@ default = ["console_error_panic_hook"]
 
 [dependencies]
 wasm-bindgen = "0.2"
-dvi2html_rs = { path= "../crate" }
+dvi2html = { path= "../crate" }
 
 # The `console_error_panic_hook` crate provides better debugging of panics by
 # logging them with `console.error`. This is great for development, but requires
