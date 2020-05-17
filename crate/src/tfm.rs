@@ -33,7 +33,7 @@ impl FontDataHelper {
     }
 }
 fn get_json() -> String {
-    return r#"
+    r#"
 {
   "cmb10": {
     "characters": {
@@ -88841,5 +88841,5 @@ fn get_json() -> String {
     "design_size": 9437184
   }
 }"#
-    .to_string();
+    .to_string()
 }

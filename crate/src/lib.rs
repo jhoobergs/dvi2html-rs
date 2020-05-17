@@ -103,6 +103,5 @@ mod tests {
             .read_to_end(&mut input_owned)
             .unwrap();
         println!("{}", dvi2html(&input_owned).unwrap());
-        assert!(true == false);
     }
 }
