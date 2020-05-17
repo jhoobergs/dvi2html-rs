@@ -31,5 +31,6 @@ wee_alloc = { version = "0.4.2", optional = true }
 wasm-bindgen-test = "0.2"
 
 [profile.release]
+lto = true #https://rustwasm.github.io/book/reference/code-size.html#compiling-with-link-time-optimizations-lto
 # Tell `rustc` to optimize for small code size.
 opt-level = "s"
