@@ -1,6 +1,6 @@
 [package]
 name = "dvi2html-wasm"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Jesse Hoobergs <jesse@hoobergs.be>"]
 description = "A dvi2html converter written in Rust and ported to WebAssembly using wasm-pack"
 repository= "https://github.com/jhoobergs/dvi2html-rs/tree/master/wasm"

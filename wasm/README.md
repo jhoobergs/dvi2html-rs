@@ -9,7 +9,7 @@
 [![npm version](https://badge.fury.io/js/dvi2html-wasm.svg)](https://badge.fury.io/js/dvi2html-wasm)
 
 ## About
-- NPM package to convet dvi files (as Uint8Array) to html
+- NPM package to convert dvi files (as Uint8Array) to html
 - It uses the dvi2html rust package (see [crate](https://github.com/jhoobergs/dvi2html-rs/tree/master/crate) folder)
 - Install with `npm i dvi2html-wasm` or `yarn add dvi2html-wasm`
 
