@@ -1,12 +1,12 @@
 [package]
 name = "dvi2html"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Jesse Hoobergs <jesse@hoobergs.be>"]
 license = "MIT OR Apache-2.0"
 description = "A dvi2html converter"
 repository = "https://github.com/jhoobergs/dvi2html-rs/tree/master/crate"
 readme = "README.md"
-include = ["src/*.rs", "Cargo.toml"]
+include = ["src/*.rs", "Cargo.toml", "src/tfmdata"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

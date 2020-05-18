@@ -26,14 +26,13 @@ println!("{}", dvi2html(&input_owned).unwrap());
 
 #### Build
 
-Create tfmdata file (once)
-```
-touch src/tfmdata
-cargo run --bin tfm
-```
-
 ```
 cargo build
+```
+
+Create tfmdata file (if json file changes)
+```
+cargo run --bin tfm
 ```
 
 #### Test 
