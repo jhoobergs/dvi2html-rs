@@ -28,6 +28,7 @@ println!("{}", dvi2html(&input_owned).unwrap());
 
 Create tfmdata file (once)
 ```
+touch src/tfmdata
 cargo run --bin tfm
 ```
 
