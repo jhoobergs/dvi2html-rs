@@ -26,6 +26,11 @@ println!("{}", dvi2html(&input_owned).unwrap());
 
 #### Build
 
+Create tfmdata file (once)
+```
+cargo run --bin tfm
+```
+
 ```
 cargo build
 ```

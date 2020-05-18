@@ -5,7 +5,7 @@ use serde_json::Result;
 
 mod htmlmachine;
 mod machine;
-mod tfm;
+pub mod tfm; //TODO visibility?
 mod utils;
 
 // Copied from https://github.com/derekdreery/dvi-rs/blob/master/tests/lib.rs
