@@ -7,7 +7,6 @@ Based on https://github.com/kisonecat/dvi2html
 - Improve error handling: use Result type much more and don't use unwrap's
 - Go through all TODO's in the code (mostly unsafe unwrap's)
 - Add documentation
-- Better solution for the json file with the fonts? 
-  - Compress the tfmdata file
+- Add ts script to generate fonts json file to this repo (submod maybe?)
 
 

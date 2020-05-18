@@ -5,8 +5,10 @@ use serde_json::Result;
 
 mod htmlmachine;
 mod machine;
-pub mod tfm; //TODO visibility?
+mod tfm;
 mod utils;
+
+pub use crate::tfm::{FontCharacterMetrics, FontData};
 
 // Copied from https://github.com/derekdreery/dvi-rs/blob/master/tests/lib.rs
 // Adapted to new version of nom

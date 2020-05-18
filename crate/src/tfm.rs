@@ -2,7 +2,6 @@ use flate2::write::ZlibDecoder;
 use serde::{Deserialize, Serialize};
 use serde_json::Result;
 use std::collections::HashMap;
-use std::fs;
 use std::io::prelude::*;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -26,13 +25,7 @@ pub struct FontDataHelper {
 }
 
 impl FontDataHelper {
-    //TODO: change error type
-    pub fn init_from_json() -> Result<FontDataHelper> {
-        let json = fs::read_to_string("fontsfull.json").expect("Failed to read the font json file");
-        //let json = get_json();
-        let data = serde_json::from_str(&json)?;
-        Ok(FontDataHelper { data })
-    }
+    // change error type
     pub fn init() -> Result<FontDataHelper> {
         let buffer = include_bytes!("tfmdata");
         let mut decoded = Vec::new();
@@ -44,8 +37,5 @@ impl FontDataHelper {
     }
     pub fn get(&self, font_name: String) -> Option<&FontData> {
         self.data.get(&font_name)
-    }
-    pub fn get_data(&self) -> &HashMap<String, FontData> {
-        &self.data
     }
 }
